@@ -1,0 +1,369 @@
+@page "/"
+@using Microsoft.JSInterop
+@inject IJSRuntime js;
+@inject EbayService EbayService;
+<!-- Pre-Header -->
+<nav class="navbar navbar-light bg-light py-1">
+    <div class="container-fluid">
+        <ul class="navbar-nav me-auto d-flex flex-row">
+            <li class="nav-item me-3"><a class="nav-link" href="#">Hi! Sign in or register</a></li>
+            <li class="nav-item me-3"><a class="nav-link" href="#">Daily Deals</a></li>
+            <li class="nav-item me-3"><a class="nav-link" href="#">Brand Outlet</a></li>
+            <li class="nav-item me-3"><a class="nav-link" href="#">Gift Cards</a></li>
+            <li class="nav-item me-3"><a class="nav-link" href="#">Help & Contact</a></li>
+        </ul>
+        <ul class="navbar-nav ms-auto d-flex flex-row">
+            <li class="nav-item me-3"><a class="nav-link" href="#">Ship to <i class="fas fa-flag"></i></a></li>
+            <li class="nav-item me-3"><a class="nav-link" href="#">Sell</a></li>
+            <li class="nav-item me-3"><a class="nav-link" href="#">Watchlist</a></li>
+            <li class="nav-item me-3"><a class="nav-link" href="#">My eBay</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i></a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Main Header -->
+<nav class="navbar navbar-light bg-white py-2">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"><img src="https://via.placeholder.com/80x30?text=eBay+Logo" alt="eBay Logo"
+                height="30"></a>
+        <div class="d-flex ms-auto align-items-center">
+            <select class="form-select me-2 border-pink" style="width: auto;" @onchange="OnCategoryChange">
+                <option value="All">All Categories</option>
+                <option value="Clothing">Clothings</option>
+                <option value="Electronics">Electronics</option>
+            </select>
+            <input class="form-control me-2" placeholder="Search for anything" @oninput="(e) => SearchProd(e)">
+            <button class="btn btn-primary me-2">Search</button>
+            <a href="" class="text-primary">Advanced</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Tiêu đề -->
+<div class="bg-light py-3 text-center">
+    <h2 class="text-uppercase fw-bold">Luxury on eBay</h2>
+</div>
+
+<!-- Nội dung chính -->
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <h5>Shop by Category</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item fw-bold">Ebay Shop</li>
+            </ul>
+            <div class="mt-3">
+                <p>All Listings (40 Results)</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><a href="#">Auction</a></li>
+                    <li class="list-group-item"><a href="#">Buy It Now</a></li>
+                </ul>
+            </div>
+            <div class="mt-3">
+                <h6>Condition</h6>
+                <select class="form-select">
+                    <option>Any Condition</option>
+                </select>
+            </div>
+            <div class="mt-3">
+                <h6>Price</h6>
+                <input type="text" class="form-control" placeholder="Enter price range">
+            </div>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between mb-3">
+                <select class="form-select w-auto border-pink" @onchange="SortByPrice">
+                    <option value="All">Best Match</option>
+                    <option value="Low to High">Price: Low to High</option>
+                    <option value="High to Low">Price: High to Low</option>
+                </select>
+                <div>
+                    <button id="rows" class="btn btn-light @(ViewMode == "rows" ? "active" : "")"
+                        @onclick="@(() => HandleChange("rows"))"><i class="fas fa-th-list"></i></button>
+                    <button id="columns" class="btn btn-light @(ViewMode == "columns" ? "active" : "")"
+                        @onclick="@(() => HandleChange("columns"))"><i class="fas fa-th"></i></button>
+                </div>
+            </div>
+            <div class="row">
+                @if (IsLoading)
+                {
+                    <div class="text-center mt-5">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- Sản phẩm 1 -->
+                    @foreach (var item in EbayService.EbayLists.Skip(currentPage * 9).Take(9))
+                    {
+                        if (ViewMode == "rows")
+                        {
+                            <div class="row mb-1 mx-1 border border-pink rounded-3 overflow-hidden align-items-center">
+                                <!-- Hình ảnh bên trái, bao phủ toàn bộ chiều cao -->
+                                <div class="col-4 col-md-3 p-0">
+                                    <img src="@item.Image" class="img-fluid w-100 h-100 object-fit-cover" alt="Product Image">
+                                </div>
+                                <!-- Thông tin sản phẩm bên phải -->
+                                <div class="col-8 col-md-9 p-3">
+                                    <h5 class="mb-1">@item.ProductName</h5>
+                                    <p class="mb-1 text-danger">@item.Price VND</p>
+                                    <p class="mb-1 text-muted"><small>@item.Description</small></p>
+                                    <p class="mb-0 text-success"><small>Free shipping</small></p>
+                                    <p class="mb-0 text-muted"><small>129 watching</small></p>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 border-pink">
+                                    <img src="@item.Image" class="card-img-top" alt="Cadillac Model">
+                                    <div class="card-body">
+                                        <h5 class="card-title">@item.ProductName</h5>
+                                        <p class="card-text">@item.Price</p>
+                                        <p class="card-text"><small class="text-muted">@item.Description</small></p>
+                                        <p class="card-text"><small class="text-success">Free shipping</small></p>
+                                        <p class="card-text"><small class="text-muted">129 watching</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                    }
+                }
+                <!-- Phân trang động -->
+                <div class="d-flex justify-content-center mt-4">
+                    <nav>
+                        <ul class="pagination">
+                            @if (totalPages == 0 && IsLoading == false)
+                            {
+                                <li class="page-item disabled" style="margin: 0 0.1rem;">
+                                    <a class="page-link" href="" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item disabled" style="margin: 0 0.1rem;">
+                                    <a class="page-link" href="">0</a>
+                                </li>
+                                <li class="page-item disabled" style="margin: 0 0.1rem;">
+                                    <a class="page-link" href="" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <!-- Nút Previous -->
+                                @if (currentPage > 0)
+                                {
+                                    <li class="page-item" style="margin: 0 0.1rem;">
+                                        <a class="page-link" href="" @onclick="@(() => OnPageClick(currentPage - 1))"><span
+                                                aria-hidden="true" aria-label="Previous">&laquo;</span></a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item disabled " style="margin: 0 0.1rem;">
+                                        <a class="page-link" href="" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                }
+
+                                <!-- Các số trang -->
+                                @for (int i = startPage; i < Math.Min(startPage + pageWindowSize, totalPages); i++)
+                                {
+                                    int pageN = i;
+                                    <li class="page-item @(currentPage == pageN - 1 ? "active" : "")" style="margin: 0 0.1rem;">
+                                        <a class="page-link" href="" @onclick="@(() => OnPageClick(pageN - 1))">@pageN</a>
+                                    </li>
+
+                                }
+                                @if (currentPage < totalPages - 4)
+                                {
+                                    <li class="page-item disabled" style="margin: 0 0.1rem;">
+                                        <a class="page-link" href="">...</a>
+                                    </li>
+                                }
+                                <li class="page-item @(currentPage == totalPages - 1 ? "active" : "")"
+                                    style="margin: 0 0.1rem;">
+                                    <a class="page-link" href=""
+                                        @onclick="@(() => OnPageClick(totalPages - 1))">@totalPages</a>
+                                </li>
+                                <!-- Nút Next -->
+                                @if (currentPage < totalPages - 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="" @onclick="@(() => OnPageClick(currentPage + 1))"
+                                            aria-label="Next" style="margin: 0 0.1rem;"><span
+                                                aria-hidden="true">&raquo;</span></a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item disabled" style="margin: 0 0.1rem;">
+                                        <a class="page-link" href="" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private bool IsLoading { get; set; }
+    private int currentPage { get; set; }
+    private int totalPages { get; set; }
+    private int pageWindowSize = 3; // Số trang hiển thị cùng lúc
+    private int startPage = 1; // Trang bắt đầu của nhóm hiển thị
+    private string? category = "";
+    private string? search = "";
+    private string? price = "";
+    bool isShowSearch = false;
+    bool isShowCategory = false;
+    string ViewMode = "rows";
+    private System.Timers.Timer debounceTimer;
+    protected override async void OnInitialized()
+    {
+        debounceTimer = new System.Timers.Timer(300); // Thời gian chờ 300ms
+        debounceTimer.Elapsed += async (sender, e) =>
+        {
+            await InvokeAsync(async () =>
+    {
+            IsLoading = true;
+            StateHasChanged(); // Cập nhật UI để hiển thị trạng thái loading
+
+        // Thực hiện tìm kiếm dựa trên giá trị hiện tại của search và category
+            if (!string.IsNullOrEmpty(search) && !string.IsNullOrEmpty(category))
+            {
+                await EbayService.SearchByKeywordAndCategory(search, category);
+            }
+            else if (!string.IsNullOrEmpty(search))
+            {
+                await EbayService.SearchByKeyword(search);
+            }
+            else if (!string.IsNullOrEmpty(category))
+            {
+                await EbayService.EbayGetByCategory(category);
+            }
+            else
+            {
+                await EbayService.EbayGetByCategory(""); // Xử lý mặc định khi không có search hay category
+            }
+            await EbayService.SortByPrice(price, category, search);
+
+            IsLoading = false;
+            StateHasChanged(); // Cập nhật UI sau khi tìm kiếm hoàn tất
+        });
+        };
+        debounceTimer.AutoReset = false; // Timer chỉ chạy một lần sau khi được kích hoạt
+
+        // Khởi tạo ban đầu
+        currentPage = 0;
+        startPage = 1;
+        IsLoading = true;
+        EbayService.OnChange += () =>
+        {
+            if (EbayService.EbayLists.Count > 0)
+            {
+                totalPages = (int)Math.Ceiling((double)EbayService.TotalProduct / 9);
+                IsLoading = false;
+            }
+            else
+            {
+                totalPages = 0;
+            }
+            StateHasChanged();
+        };
+        await EbayService.EbayGetByCategory(category);
+    }
+    protected async void OnPageClick(int pageNumber)
+    {
+        currentPage = pageNumber;
+        IsLoading = true;
+
+        // Điều chỉnh startPage để dịch chuyển nhóm trang
+        if (currentPage >= startPage)
+        {
+            startPage = currentPage + 1; // Dịch sang phải
+        }
+        else if (currentPage < startPage)
+        {
+            startPage = currentPage + 1; // Dịch sang trái
+        }
+
+        // Đảm bảo startPage không vượt quá giới hạn
+        if (startPage < 1) startPage = 1;
+        if (startPage > totalPages + 1) startPage = totalPages + 1;
+        if (isShowSearch)
+        {
+            await EbayService.SearchByKeyword(search);
+        }
+        else if (isShowCategory)
+        {
+            await EbayService.EbayGetByCategory(category);
+        }
+        else if (isShowSearch == true && isShowCategory == true)
+        {
+            await EbayService.SearchByKeywordAndCategory(search, category);
+        }
+        else
+        {
+            await EbayService.EbayGetByCategory(category);
+        }
+        await EbayService.SortByPrice(price, category, search);
+    }
+    private async void OnCategoryChange(ChangeEventArgs e)
+    {
+        category = e.Value.ToString();
+        isShowCategory = !string.IsNullOrEmpty(category); // Cập nhật trạng thái hiển thị category
+        if (!isShowCategory)
+        {
+            isShowSearch = false; // Đặt lại search nếu category trống
+        }
+        debounceTimer.Stop(); // Dừng timer cũ
+        debounceTimer.Start(); // Bắt đầu lại timer với 300ms
+    }
+    private async void SearchProd(ChangeEventArgs e)
+    {
+        search = e.Value.ToString();
+        isShowSearch = !string.IsNullOrEmpty(search); // Cập nhật trạng thái hiển thị tìm kiếm
+        if (!isShowSearch)
+        {
+            isShowCategory = false; // Đặt lại category nếu search trống
+        }
+        debounceTimer.Stop(); // Dừng timer cũ
+        debounceTimer.Start(); // Bắt đầu lại timer với 300ms
+    }
+    private async void SortByPrice(ChangeEventArgs e)
+    {
+        currentPage = 0;
+        startPage = 1;
+        IsLoading = true;
+        price = e.Value.ToString();
+        await EbayService.SortByPrice(price, category, search);
+        IsLoading = false;
+    }
+    private async void HandleChange(string id)
+    {
+        ViewMode = id;
+    }
+    public void Dispose()
+    {
+        EbayService.OnChange -= StateHasChanged;
+        debounceTimer?.Dispose();
+    }
+}

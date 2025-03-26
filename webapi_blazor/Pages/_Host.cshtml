@@ -1,0 +1,58 @@
+@page "/"
+@namespace webapi_blazor.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Blazor Server</title>
+    <base href="~/" />
+    <!-- Liên kết Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Liên kết Font Awesome cho biểu tượng -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/site.css" />
+    <style>
+        .border-pink {
+            border: 2px solid pink;
+        }
+
+        .text-success {
+            color: green;
+        }
+
+        .border-pink {
+            border-color: #ff69b4 !important;
+            /* Màu hồng giống trong hình */
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+            /* Màu đỏ cho giá */
+        }
+
+        .text-success {
+            color: #28a745 !important;
+            /* Màu xanh cho "Free shipping" */
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+            /* Màu xám cho các chi tiết phụ */
+        }
+    </style>
+</head>
+
+<body>
+    <app>
+        <component type="typeof(App)" render-mode="ServerPrerendered" />
+    </app>
+    <script src="_framework/blazor.server.js"></script>
+
+    <!-- Liên kết Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

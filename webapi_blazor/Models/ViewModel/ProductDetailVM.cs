@@ -1,0 +1,16 @@
+using System;
+
+namespace webapi_blazor.Models.ViewModel
+{
+    public class ProductDetailVM
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+        public string Category { get; set; }
+        public string Description { get; set; }
+        public decimal Price { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string ListImage { get; set; } // Có thể là URL hoặc đường dẫn đến hình ảnh
+    }
+}
